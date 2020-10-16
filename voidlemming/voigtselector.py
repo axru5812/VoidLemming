@@ -9,13 +9,13 @@ from .LyaFitClasses import baseFitter
 
 from .data import abslines_uv
 
-#from astropy.modeling.models import Voigt1D
+# from astropy.modeling.models import Voigt1D
 from .plotfunctions import fill_between_steps
 
 # sys.path.insert(0, "/home/axel/PhD/LARS/uv-spectroscopy/lyakinematics/")
 from . import voigt
 
-#sys.path.insert(0, "../optical-spectroscopy/")
+# sys.path.insert(0, "../optical-spectroscopy/")
 from . import spechelpers as sh
 
 # =============================================================================
@@ -24,7 +24,7 @@ from . import spechelpers as sh
 
 
 class VoigtFitter(baseFitter):
-    """ Class for handling matplotlib callback plots and fitting a voigt profile to it. 
+    """ Class for handling matplotlib callback plots and fitting a voigt profile to it.
     The voigt profile is based on a tool written by X Prochaska (I think)
 
     Parameters
@@ -49,7 +49,7 @@ class VoigtFitter(baseFitter):
     velocity : float (optional)
         Extra velocity that can be used to shift the centroid of the absorption line.
         Can for instance be used to set the centroid to that of SII
-    
+
     Methods
     -------
     export_fit
@@ -60,6 +60,7 @@ class VoigtFitter(baseFitter):
 
 
     """
+
     def __init__(
         self,
         specfile,
@@ -95,8 +96,8 @@ class VoigtFitter(baseFitter):
             self.redshift = redshift
             self.restframe = False
         else:
-            self.restframe=True
-            self.redshift=0
+            self.restframe = True
+            self.redshift = 0
 
         if not self.restframe:
             # De-redshift the spectrum
@@ -536,12 +537,7 @@ class VoigtFitter(baseFitter):
         voigtParams = voigtModel.make_params()
 
         # Run the fit
-        result = voigtModel.fit(
-            incFlux,
-            x=incWl,
-            params=voigtParams,
-            fit_kws={"nan_policy": "propagate"},
-        )
+        result = voigtModel.fit(incFlux, x=incWl, params=voigtParams)
         self.bestFitParams = result.params
         self.voigtModel = voigtModel
         # Plot the fit
@@ -656,7 +652,9 @@ class VoigtFitter(baseFitter):
             gamma = 6.25 * 1e8
 
             # Get taus
-            tau = voigt.voigt_tau(wave, [logN, z, b * 1e5, wrest / 1e8, f, gamma])
+            tau = voigt.voigt_tau(
+                wave, [logN, z, b * 1e5, wrest / 1e8, f, gamma]
+            )
             flux = np.exp(-1 * tau)
 
             return flux
@@ -669,14 +667,14 @@ class VoigtFitter(baseFitter):
         else:
             self.comment = comment
 
-
     def export_fit(self, filename):
         df = pd.DataFrame()
-        df['wl'] = self.wl
-        df['voigt'] = (
-            self.voigtModel.eval(x=self.wl, params=self.bestFitParams) * self.contPoly(self.wl)
-        )
-        df.to_csv(filename, sep='\t', index=False)
+        df["wl"] = self.wl
+        df["voigt"] = self.voigtModel.eval(
+            x=self.wl, params=self.bestFitParams
+        ) * self.contPoly(self.wl)
+        df.to_csv(filename, sep="\t", index=False)
+
 
 # ============================================================================
 # DEFINE VOIGT MODEL
